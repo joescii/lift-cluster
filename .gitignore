@@ -1,0 +1,15 @@
+# sbt specific
+console.devmode.log
+target/
+project/target/
+
+# eclipse stuff
+.classpath
+.project
+.settings/
+
+# IntelliJ IDEA stuff
+*.iml
+.idea/
+
+*.swp
