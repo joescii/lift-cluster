@@ -1,6 +1,6 @@
 organization in ThisBuild          := "com.joescii" // TODO switch to liftmodules once shippable
 version in ThisBuild               := "0.0.1-SNAPSHOT"
-homepage in ThisBuild              := Some(url("http://www.liftweb.net")) // TODO joscii
+homepage in ThisBuild              := Some(url("https://github.com/joescii/lift-cluster"))
 licenses in ThisBuild              += ("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 startYear in ThisBuild             := Some(2017)
 organizationName in ThisBuild      := "WorldWide Conferencing, LLC"
