@@ -1,6 +1,6 @@
 package net.liftmodules.cluster
 
-import net.liftweb.common.{Box, Empty, Loggable}
+import net.liftweb.common.{Box, Empty, Full, Loggable}
 import net.liftweb.http.{LiftRules, LiftSession}
 import net.liftweb.http.js.JsCmds
 
@@ -25,7 +25,7 @@ object LiftCluster extends Loggable {
           }
           .openOr {
             logger.debug(s"New LiftSession created for container session ID ${httpSession.sessionId}")
-            new LiftSession(contextPath, httpSession.sessionId, Empty)
+            new LiftSession(contextPath, httpSession.sessionId, Full(httpSession))
           }
     }
 
