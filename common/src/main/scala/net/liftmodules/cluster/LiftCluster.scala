@@ -1,6 +1,6 @@
 package net.liftmodules.cluster
 
-import net.liftweb.common.{Box, Empty, Full, Loggable}
+import net.liftweb.common.{Box, Full, Loggable}
 import net.liftweb.http.{LiftRules, LiftSession}
 import net.liftweb.http.js.JsCmds
 
