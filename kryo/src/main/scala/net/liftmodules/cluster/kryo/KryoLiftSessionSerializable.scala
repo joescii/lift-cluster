@@ -1,4 +1,4 @@
-package net.liftmodules.kryo
+package net.liftmodules.cluster.kryo
 
 import java.io.ObjectOutputStream
 
