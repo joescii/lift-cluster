@@ -1,5 +1,5 @@
 organization in ThisBuild          := "com.joescii" // TODO switch to liftmodules once shippable
-version in ThisBuild               := "0.0.1"
+version in ThisBuild               := "0.0.1-SNAPSHOT"
 homepage in ThisBuild              := Some(url("https://github.com/joescii/lift-cluster"))
 licenses in ThisBuild              += ("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 startYear in ThisBuild             := Some(2017)
@@ -18,7 +18,10 @@ val common = Project("lift-cluster-common", file("./common"))
   .settings(libraryDependencies ++= Seq(
     "net.liftweb"   %% "lift-webkit" % liftVersion.value % "provided", 
     "org.scalatest" %% "scalatest"   % "3.0.0"           % "test"
-  ))
+  ),
+    name := name.value + "_" + liftEdition.value,
+    moduleName := name.value // Necessary beginning with sbt 0.13, otherwise Lift editions get messed up.
+  )
 
 val kryo = Project("lift-cluster-kryo", file("./kryo"))
   .dependsOn(common)
@@ -26,7 +29,10 @@ val kryo = Project("lift-cluster-kryo", file("./kryo"))
     "net.liftweb"   %% "lift-webkit" % liftVersion.value % "provided",
     "com.twitter"   %% "chill"       % "0.9.2"           % "compile",
     "org.scalatest" %% "scalatest"   % "3.0.0"           % "test"
-  ))
+  ),
+    name := name.value + "_" + liftEdition.value,
+    moduleName := name.value // Necessary beginning with sbt 0.13, otherwise Lift editions get messed up.
+  )
 
 
 
