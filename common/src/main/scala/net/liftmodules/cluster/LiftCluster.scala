@@ -43,7 +43,6 @@ object LiftCluster extends Loggable {
       }
     })
     
-    LiftRules.early.append(req => SessionMaster.addHttpSession(req.session))
     LiftSession.onShutdownSession :+= {session: LiftSession => SessionMaster.removeHttpSession(session.underlyingId)}
   }
 }
