@@ -27,7 +27,6 @@ val kryo = Project("lift-cluster-kryo", file("./kryo"))
   .dependsOn(common)
   .settings(libraryDependencies ++= Seq(
     "net.liftweb"             %% "lift-webkit"    % liftVersion.value     % "provided",
-    "org.eclipse.jetty.orbit" %  "javax.servlet"  % "3.0.0.v201112011016" % "provided" artifacts Artifact("javax.servlet", "jar", "jar"),
     "com.twitter"             %% "chill"          % "0.9.2"               % "compile",
     "org.scalatest"           %% "scalatest"      % "3.0.0"               % "test"
   ),
