@@ -2,10 +2,9 @@ package net.liftmodules.cluster.kryo
 
 import java.io.ObjectOutputStream
 
-import com.twitter.chill.{KryoInstantiator, KryoPool, ScalaKryoInstantiator}
+import com.twitter.chill._
 import net.liftmodules.cluster.SerializableLiftSession
 import net.liftweb.http.LiftSession
-
 
 object KryoSerializableLiftSession {
   val serializer: LiftSession => SerializableLiftSession = new KryoSerializableLiftSession(_)
@@ -21,24 +20,27 @@ class KryoSerializableLiftSession(@transient val _session: LiftSession) extends 
 
 /**
   * Converts any object into a java.io.Serializable object by using twitter chill (and hence kryo) under the hood.
-  * @param obj any object you wish to serialize
+  * @param data either the object to serialize, or the array to deserialize
   * @tparam T the type of object to serialize
   */
 @SerialVersionUID(1L)
-final class KryoSerializable[T](@transient val obj: T) extends Serializable {
+final class KryoSerializable[T](@transient data:Either[T, Array[Byte]]) extends Serializable {
+  @transient lazy val obj = data.fold[T](identity, deserialize(_))
+  private[this] lazy val bytes: Array[Byte] = data.fold[Array[Byte]](serialize(_), identity)
+
   private[this] def kryo: KryoInstantiator = {
-    val instantiator = new ScalaKryoInstantiator
+    val instantiator = new LiftInstantiator
     instantiator.setRegistrationRequired(false)
     instantiator.setReferences(true)
   }
 
-  private[this] def deserialize(): T = {
+  private[this] def deserialize(bytes: Array[Byte]): T = {
     KryoPool.withByteArrayOutputStream(1, kryo)
       .fromBytes(bytes)
       .asInstanceOf[T]
   }
 
-  private[this] lazy val bytes: Array[Byte] = {
+  private[this] def serialize(obj: T): Array[Byte] = {
     val kpool = KryoPool.withByteArrayOutputStream(1, kryo)
     val bytes = kpool.toBytesWithClass(obj)
     bytes
@@ -61,10 +63,11 @@ final class KryoSerializable[T](@transient val obj: T) extends Serializable {
     * value for the constructor parameter obj.
     * @return an object to replace this one after deserialization.
     */
-  protected def readResolve(): Any = KryoSerializable(this.deserialize())
+  protected def readResolve(): Any = KryoSerializable(this.bytes)
 }
 
 object KryoSerializable {
-  def apply[T](obj: T): KryoSerializable[T] = new KryoSerializable(obj)
+  def apply[T](obj: T): KryoSerializable[T] = new KryoSerializable(Left(obj))
+  def apply[T](bytes: Array[Byte]): KryoSerializable[T] = new KryoSerializable[T](Right(bytes))
 }
 

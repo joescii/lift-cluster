@@ -1,8 +1,11 @@
 package net.liftmodules.cluster
 
+import java.util.concurrent.ConcurrentHashMap
+
 import net.liftweb.common.{Box, Full, Loggable}
 import net.liftweb.http.{LiftRules, LiftSession}
 import net.liftweb.http.js.JsCmds
+import net.liftweb.http.provider.HTTPSession
 
 trait SerializableLiftSession extends Serializable {
   def session: LiftSession
@@ -16,7 +19,9 @@ object LiftCluster extends Loggable {
     LiftRules.noCometSessionCmd.default.set(() => JsCmds.Run("lift.rehydrateComets()"))
 
     LiftRules.sessionCreator = {
-      case (httpSession, contextPath) =>
+      case (httpSession, contextPath) => {
+        SessionMaster.addHttpSession(httpSession)
+
         (Box !! (httpSession.attribute("net.liftweb.http.LiftSession")))
           .asA[SerializableLiftSession]
           .map { ser =>
@@ -27,6 +32,7 @@ object LiftCluster extends Loggable {
             logger.debug(s"New LiftSession created for container session ID ${httpSession.sessionId}")
             new LiftSession(contextPath, httpSession.sessionId, Full(httpSession))
           }
+      }
     }
 
     LiftRules.afterSend.append((res, httpRes, headers, maybeReq) => {
@@ -36,5 +42,16 @@ object LiftCluster extends Loggable {
         logger.debug("Placing LiftSession in container for session ID " + session.httpSession.map(_.sessionId))
       }
     })
+    
+    LiftRules.early.append(req => SessionMaster.addHttpSession(req.session))
+    LiftSession.onShutdownSession :+= {session: LiftSession => SessionMaster.removeHttpSession(session.underlyingId)}
   }
+}
+
+object SessionMaster {
+  private val httpSessions: ConcurrentHashMap[String, HTTPSession] = new ConcurrentHashMap()
+
+  def addHttpSession(httpSession: HTTPSession): Unit = httpSessions.put(httpSession.sessionId, httpSession)
+  def getHttpSession(id: String): Box[HTTPSession] = Box.legacyNullTest(httpSessions.get(id))
+  def removeHttpSession(id: String): Unit = httpSessions.remove(id)
 }
