@@ -25,26 +25,10 @@ class KryoSerializableLiftSession(@transient val _session: LiftSession) extends 
   */
 @SerialVersionUID(1L)
 final class KryoSerializable[T](@transient data:Either[T, Array[Byte]]) extends Serializable {
-  @transient lazy val obj = data.fold[T](identity, deserialize(_))
+  import KryoSerializable._
+
+  @transient lazy val obj = data.fold[T](identity, deserialize[T](_))
   private[this] lazy val bytes: Array[Byte] = data.fold[Array[Byte]](serialize(_), identity)
-
-  private[this] def kryo: KryoInstantiator = {
-    val instantiator = new LiftInstantiator
-    instantiator.setRegistrationRequired(false)
-    instantiator.setReferences(true)
-  }
-
-  private[this] def deserialize(bytes: Array[Byte]): T = {
-    KryoPool.withByteArrayOutputStream(1, kryo)
-      .fromBytes(bytes)
-      .asInstanceOf[T]
-  }
-
-  private[this] def serialize(obj: T): Array[Byte] = {
-    val kpool = KryoPool.withByteArrayOutputStream(1, kryo)
-    val bytes = kpool.toBytesWithClass(obj)
-    bytes
-  }
 
   /**
     * Called during serialization
@@ -69,5 +53,25 @@ final class KryoSerializable[T](@transient data:Either[T, Array[Byte]]) extends 
 object KryoSerializable {
   def apply[T](obj: T): KryoSerializable[T] = new KryoSerializable(Left(obj))
   def apply[T](bytes: Array[Byte]): KryoSerializable[T] = new KryoSerializable[T](Right(bytes))
+
+  private[this] def kryo: KryoInstantiator = {
+    val instantiator = new LiftInstantiator
+    instantiator.setRegistrationRequired(false)
+    instantiator.setReferences(true)
+  }
+
+  def deserialize[T](bytes: Array[Byte]): T = {
+    KryoPool.withByteArrayOutputStream(1, kryo)
+      .fromBytes(bytes)
+      .asInstanceOf[T]
+  }
+
+  def serialize[T](obj: T): Array[Byte] = {
+    val kpool = KryoPool.withByteArrayOutputStream(1, kryo)
+    val bytes = kpool.toBytesWithClass(obj)
+    bytes
+  }
+
+  def roundTrip[T](obj: T): T = deserialize(serialize(obj))
 }
 
