@@ -3,6 +3,7 @@ package net.liftmodules.cluster.kryo
 import com.twitter.chill._
 import net.liftmodules.cluster.SessionMaster
 import net.liftweb.http.provider.HTTPSession
+import _root_.java.util.{ ResourceBundle, Locale }
 
 class LiftInstantiator extends ScalaKryoInstantiator {
   override def newKryo(): KryoBase = {
@@ -15,6 +16,7 @@ class LiftInstantiator extends ScalaKryoInstantiator {
 class LiftRegistrar extends IKryoRegistrar {
   override def apply(k: Kryo): Unit = {
     k.forSubclass[HTTPSession](new HTTPSessionSerializer)
+    k.forSubclass[ResourceBundle](new ResourceBundleSerializer)
   }
 }
 
@@ -29,3 +31,15 @@ class HTTPSessionSerializer extends KSerializer[HTTPSession] {
   }
 }
 
+class ResourceBundleSerializer extends KSerializer[ResourceBundle] {
+  override def read(kryo: Kryo, input: Input, t: Class[ResourceBundle]): ResourceBundle = {
+    val name = kryo.readObject(input, classOf[String])
+    val locale = kryo.readObject(input, classOf[Locale])
+    ResourceBundle.getBundle(name, locale)
+  }
+
+  override def write(kryo: Kryo, output: Output, bundle: ResourceBundle): Unit = {
+    kryo.writeObject(output, bundle.getBaseBundleName)
+    kryo.writeObject(output, bundle.getLocale)
+  }
+}
