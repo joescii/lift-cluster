@@ -34,6 +34,14 @@ val kryo = Project("lift-cluster-kryo", file("./kryo"))
     moduleName := name.value // Necessary beginning with sbt 0.13, otherwise Lift editions get messed up.
   )
 
-
+val jetty9 = Project("lift-cluster-jetty9", file("./jetty9"))
+  .settings(libraryDependencies ++= Seq(
+    "net.liftweb"             %% "lift-webkit"    % liftVersion.value     % "provided",
+    "org.eclipse.jetty"       %  "jetty-webapp"   % "9.0.7.v20131107"     % "provided", // Using latest 9.0.x to ensure we're backwards-compatible
+    "org.scalatest"           %% "scalatest"      % "3.0.0"               % "test"
+  ),
+    name := name.value + "_" + liftEdition.value,
+    moduleName := name.value // Necessary beginning with sbt 0.13, otherwise Lift editions get messed up.
+  )
 
 
