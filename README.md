@@ -132,7 +132,7 @@ Modules affected: `lift-cluster-common`, `lift-cluster-kryo`, and `lift-cluster-
 
 ## License
 
-**lift-ng** is licensed under [APL 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+**lift-cluster** is licensed under [APL 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 Copyright 2017 net.liftweb
 
