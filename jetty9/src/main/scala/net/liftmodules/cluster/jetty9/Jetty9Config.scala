@@ -41,17 +41,15 @@ trait SqlEndpointConfig {
 object SqlEndpointConfig {
 
   /**
-    * Fully-specified SQL endpoint
-    * @param vendor the SQL vendor such as MySQL, Postgres, etc
+    * Fully-specified MySQL endpoint
     * @param host the SQL server hostname
     * @param port the SQL server port
     * @param dbName the database to use for jetty clustering tables
     * @param user the SQL db username
     * @param password the SQL db password
     */
-  def apply(vendor: SqlVendor, host: String, port: Int, dbName: String, user: String, password: String): SqlEndpointConfig = new SqlEndpointConfig() {
-    override def endpoint: String = s"jdbc:$vendor://$host:$port/$dbName?user=$user&password=$password"
-  }
+  def forMySQL(host: String, port: Int, dbName: String, user: String, password: String, extraParam: (String, String)*): MySQLEndpointConfig =
+    MySQLEndpointConfig(host, port, dbName, user, password, extraParam: _*)
 
   /**
     * Digs around in the system ENV to give you the correct config while running in Heroku.
@@ -65,27 +63,29 @@ object SqlEndpointConfig {
     val password = dbUri.getUserInfo.split(":")(1)
 
     Full(new SqlEndpointConfig {
-      override def endpoint: String = s"jdbc:$VendorMysql://${dbUri.getHost}${dbUri.getPath}?user=$username&password=$password&${dbUri.getQuery}"
+      override val endpoint: String = s"jdbc:mysql://${dbUri.getHost}${dbUri.getPath}?user=$username&password=$password&${dbUri.getQuery}"
     })
   }
 }
 
-/**
-  * A SQL Vendor such as MySQL, etc
-  */
-sealed trait SqlVendor
-case object VendorMysql extends SqlVendor {
-  override def toString: String = "mysql"
-}
-case class VendorOther(name: String) extends SqlVendor {
-  override def toString: String = name
+case class MySQLEndpointConfig(host: String, port: Int, dbName: String, user: String, password: String, extraParam: (String, String)*) extends SqlEndpointConfig {
+  private[this] val params: String = (("user" -> user) :: ("password" -> password) :: extraParam.toList)
+    .map { case (k, v) => k + "=" + v }
+    .mkString("&")
+
+  override val endpoint: String = s"jdbc:mysql://$host:$port/$dbName?$params"
+
+  def withParam(key: String, value: String): MySQLEndpointConfig = MySQLEndpointConfig(host, port, dbName, user, password, (this.extraParam :+ (key -> value)):_*)
+
+  def withUseSSL(ssl: Boolean = true): MySQLEndpointConfig = withParam("useSSL", ssl.toString)
+  def withCreateDatabaseIfNotExist(create: Boolean = true): MySQLEndpointConfig = withParam("createDatabaseIfNotExist", create.toString)
 }
 
 /**
   * Jdbc SQL driver
   */
 sealed trait SqlDriver
-case object DriverMysql extends SqlDriver {
+case object DriverMySQL extends SqlDriver {
   override def toString: String = "com.mysql.jdbc.Driver"
 }
 case object DriverMariaDB extends SqlDriver {
