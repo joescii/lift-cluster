@@ -51,18 +51,11 @@ import net.liftweb.util.{LoggingAutoConfigurer, Props, StringHelpers}
 import util.Properties
 
 object Start extends App with Loggable {
-
-  LoggingAutoConfigurer().apply()
-
-  logger.info("run.mode: " + Props.modeName)
-  logger.trace("system environment: " + sys.env)
-  logger.trace("system props: " + sys.props)
-  logger.info("liftweb props: " + Props.props)
-  logger.info("args: " + args.toList)
-
   startLift()
 
   def startLift(): Unit = {
+    LoggingAutoConfigurer().apply()
+    
     val endpoint = Some(SqlEndpointConfig.forMySQL("host", 3306, "my_db", "user", "password", "extra" -> "param"))
     val clusterConfig = Some(Jetty9ClusterConfig(
       workerName = "node1",
@@ -141,7 +134,7 @@ Modules affected: `lift-cluster-common`, `lift-cluster-kryo`, and `lift-cluster-
 
 **lift-ng** is licensed under [APL 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-Copyright 2015 net.liftweb
+Copyright 2017 net.liftweb
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
