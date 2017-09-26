@@ -10,7 +10,7 @@ import org.eclipse.jetty.webapp.WebAppContext
   */
 object Jetty9Starter extends Loggable {
   def start(config: Jetty9Config): Unit = {
-    logger.info("starting Lift server...")
+    logger.info("Starting Lift server...")
 
     val webappDir: String = Option(this.getClass.getClassLoader.getResource("webapp"))
       .map(_.toExternalForm)
