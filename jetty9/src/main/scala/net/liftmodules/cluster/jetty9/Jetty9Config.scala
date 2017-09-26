@@ -8,12 +8,14 @@ import net.liftweb.common.{Box, Failure, Full}
   * Config object for jetty 9
   * @param port port number in which to run the app
   * @param contextPath the root context path to make your application available at
+  * @param webappPath path to the target or source webapp directory, allowing embedded jetty to run locally
   * @param clusterConfig optional configuration for clustering
   */
 case class Jetty9Config (
-  port: Int,
-  contextPath: String,
-  clusterConfig: Option[Jetty9ClusterConfig]
+  port: Int = 8080,
+  contextPath: String = "/",
+  webappPath: String = "target/webapp",
+  clusterConfig: Option[Jetty9ClusterConfig] = None
 )
 
 /**
