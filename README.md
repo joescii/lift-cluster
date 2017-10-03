@@ -4,7 +4,11 @@ The Lift modules in this project allow Lift utilize a clustered servlet containe
 
 ## Motivation
 
-Lift application server failure without losing pages served (i.e. forcing them to refresh)
+By design, a page served by Lift can only be further serviced with Ajax calls and comet updates by the application server instance which served the page.
+While this provides a strong layer of security for Lift applications, it has a drawback that if the Lift application server were to fail, all pages served must be reloaded against a new instance.
+
+This project provides tooling to deploy Lift in a clustered mode which allows peer instances of the Lift application server to service pages served by a failed instance.
+Please read [Deployment Considerations](#deployment-considerations) below for the implications of running Lift in this manner.
 
 ### How These Modules Solve the Problem
 
@@ -95,10 +99,31 @@ class Boot {
 }
 ```
 
-## Devops/Deployment Considerations
+## Development and Testing Considerations
 
-DB-per cluster TODO
-Canary releases TODO
+Utilizing lift-cluster places some constraints on the way you can write your Lift application code.
+The two primary considerations are session serialization/deserialization and comet rehydration.
+
+### Serialization
+
+The lift-cluster-kryo module serializes each `LiftSession` instance in the servlet container.
+(More precisely, we wrap the `LiftSession` instance such that when Java serialization is utilized by the container, we use Kryo to do the dirty work).
+
+TODO: Watch for serialization exceptions
+
+### Deserialization
+
+TODO: Watch for null pointer exceptions
+
+### Comet Rehydration
+
+TODO: Beware of state in comets
+
+## Deployment Considerations
+
+TODO DB-per cluster 
+
+TODO Canary releases 
 
 ## Community/Support
 
@@ -129,6 +154,9 @@ Please include as much as you are able, such as tests, documentation, updates to
 ## Change log
 * *0.0.1*: First release which seems to work.
 Modules affected: `lift-cluster-common`, `lift-cluster-kryo`, and `lift-cluster-jetty9`
+
+## Credits
+This project and updates to the Lift project were developed in collaboration with and support from [Fractal Industries Inc](http://www.fractalindustries.com/).
 
 ## License
 
