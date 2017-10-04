@@ -5,6 +5,8 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.session.{JDBCSessionIdManager, JDBCSessionManager}
 import org.eclipse.jetty.webapp.WebAppContext
 
+import scala.util.{Failure, Try}
+
 /**
   * Object for starting a Lift app with Jetty 9
   */
@@ -40,9 +42,30 @@ object Jetty9Starter extends Loggable {
     }
 
     server.setHandler(context)
-    server.start()
-    logger.info(s"Lift server started on port ${config.port}")
-    server.join()
+
+    val attempts = Stream.from(1).takeWhile(_ <= config.patienceConfig.attempts)
+      .map { attemptNumber =>
+        val attempt = Try(server.start())
+        attempt.failed.foreach { ex =>
+          logger.info(s"Attempt number $attemptNumber of ${config.patienceConfig.attempts} to start jetty failed.")
+          logger.debug("The exception", ex)
+          Thread.sleep(config.patienceConfig.millisBetweenAttempts)
+        }
+        attempt
+      }
+
+    val firstSuccess = attempts.find(_.isSuccess)
+
+    firstSuccess match {
+      case Some(_) =>
+        logger.info(s"Lift server started on port ${config.port}")
+        server.join()
+      case _ =>
+        logger.error(s"Exhausted ${config.patienceConfig.attempts} attempts to start Jetty!")
+        attempts.zipWithIndex.collect {
+          case (Failure(ex), i) => logger.error(s"Exception from attempt $i", ex)
+        }
+    }
   }
 
 }

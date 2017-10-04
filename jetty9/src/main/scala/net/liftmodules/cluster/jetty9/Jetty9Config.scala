@@ -10,12 +10,14 @@ import net.liftweb.common.{Box, Failure, Full}
   * @param contextPath the root context path to make your application available at
   * @param webappPath path to the target or source webapp directory, allowing embedded jetty to run locally
   * @param clusterConfig optional configuration for clustering
+  * @param patienceConfig how patient we will be trying to start the server when Jetty throws us an exception
   */
 case class Jetty9Config (
   port: Int = 8080,
   contextPath: String = "/",
   webappPath: String = "target/webapp",
-  clusterConfig: Option[Jetty9ClusterConfig] = None
+  clusterConfig: Option[Jetty9ClusterConfig] = None,
+  patienceConfig: PatienceConfig = PatienceConfig(60, 1000)
 )
 
 /**
@@ -29,6 +31,8 @@ case class Jetty9ClusterConfig (
   jdbcDriver: SqlDriver,
   sqlEndpointConfig: SqlEndpointConfig
 )
+
+case class PatienceConfig(attempts: Int, millisBetweenAttempts: Int)
 
 /**
   * Config object for SQL endpoints
