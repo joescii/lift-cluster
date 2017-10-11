@@ -1,5 +1,7 @@
 package net.liftmodules.cluster.jetty9
 
+import java.net.InetSocketAddress
+
 import net.liftweb.common.Loggable
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.session.{JDBCSessionIdManager, JDBCSessionManager}
@@ -21,7 +23,8 @@ object Jetty9Starter extends Loggable {
 
     logger.debug(s"webappDir: $webappDir")
 
-    val server = new Server(config.port)
+    val address = new InetSocketAddress("0.0.0.0", config.port)
+    val server = new Server(address)
     val context = new WebAppContext(webappDir, config.contextPath)
 
     config.clusterConfig.foreach { clusterConfig =>
