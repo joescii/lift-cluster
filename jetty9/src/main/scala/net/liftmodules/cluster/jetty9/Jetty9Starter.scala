@@ -23,8 +23,10 @@ object Jetty9Starter extends Loggable {
 
     logger.debug(s"webappDir: $webappDir")
 
-    val address = new InetSocketAddress("0.0.0.0", config.port)
-    val server = new Server(address)
+    val server = config.host.map { host =>
+      val addr = new InetSocketAddress(host, config.port)
+      new Server(addr)
+    }.getOrElse( new Server(config.port) )
     val context = new WebAppContext(webappDir, config.contextPath)
 
     config.clusterConfig.foreach { clusterConfig =>

@@ -153,7 +153,9 @@ Please include as much as you are able, such as tests, documentation, updates to
 
 ## Change log
 * *0.0.1*: First release which seems to work.
-Modules affected: `lift-cluster-common`, `lift-cluster-kryo`, and `lift-cluster-jetty9`
+Modules affected: `lift-cluster-common`, `lift-cluster-kryo`, and `lift-cluster-jetty9`.
+* *0.0.2*: Added `PatienceConfig` and `host` as config parameters for `JettyStart`.
+Modules affected: `lift-cluster-jetty9`.
 
 ## Credits
 This project and updates to the Lift project were developed in collaboration with and support from [Fractal Industries Inc](http://www.fractalindustries.com/).

@@ -7,6 +7,7 @@ import net.liftweb.common.{Box, Failure, Full}
 /**
   * Config object for jetty 9
   * @param port port number in which to run the app
+  *             @param host optional hostname/ip to listen to. Default is ultimately 127.0.0.1. Pass 0.0.0.0 if running in docker
   * @param contextPath the root context path to make your application available at
   * @param webappPath path to the target or source webapp directory, allowing embedded jetty to run locally
   * @param clusterConfig optional configuration for clustering
@@ -14,6 +15,7 @@ import net.liftweb.common.{Box, Failure, Full}
   */
 case class Jetty9Config (
   port: Int = 8080,
+  host: Option[String] = None,
   contextPath: String = "/",
   webappPath: String = "target/webapp",
   clusterConfig: Option[Jetty9ClusterConfig] = None,
