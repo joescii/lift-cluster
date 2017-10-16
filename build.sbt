@@ -1,5 +1,5 @@
 organization in ThisBuild          := "net.liftmodules"
-version in ThisBuild               := "0.0.2-SNAPSHOT"
+version in ThisBuild               := "0.0.2"
 homepage in ThisBuild              := Some(url("https://github.com/joescii/lift-cluster"))
 licenses in ThisBuild              += ("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 startYear in ThisBuild             := Some(2017)

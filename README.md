@@ -33,7 +33,7 @@ Add both `lift-cluster-kryo` and `lift-cluster-jetty9` as dependencies in your `
 libraryDependencies ++= {
   val liftVersion = "3.2.0-SNAPSHOT" 
   val liftEdition = liftVersion.value.replaceAllLiterally("-SNAPSHOT", "").split('.').take(2).mkString(".")
-  val clusterVersion = "0.0.1-SNAPSHOT"
+  val clusterVersion = "0.0.2"
   Seq(
     // Other dependencies ...
     "net.liftmodules"   %% ("lift-cluster-kryo_"+liftEdition)   % clusterVersion % "compile",
