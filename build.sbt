@@ -4,8 +4,8 @@ homepage in ThisBuild              := Some(url("https://github.com/joescii/lift-
 licenses in ThisBuild              += ("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 startYear in ThisBuild             := Some(2017)
 organizationName in ThisBuild      := "WorldWide Conferencing, LLC"
-crossScalaVersions in ThisBuild    := Seq("2.12.2", "2.11.11")
-scalaVersion in ThisBuild          := (crossScalaVersions in ThisBuild).value.head
+crossScalaVersions in ThisBuild    := Seq("2.11.11") // TODO support 2.12 https://github.com/joescii/lift-cluster/issues/1
+scalaVersion in ThisBuild          := (crossScalaVersions in ThisBuild).value.last
 
 
 val liftVersion = SettingKey[String]("liftVersion", "Full version number of the Lift Web Framework")
